@@ -8,3 +8,146 @@ Parameters
 S(0)	is the initial proportion of the population that are susceptible.
 I(0)	is the initial proportion of the population that are infectious.
 
+
+
+We have 3 variables S, I and R which are respectively the numbers of susceptibles, infectious and recovered, and we have 2 parameters β and γ which are respectively the infectious contact rate and the recovery rate.
+
+A mathematical description
+A mathematical description of the above SIR model using the differential equations formalism looks like:
+
+dS/dt=−β×I×S
+dI/dt=β×I×S−γ×I
+dR/dt=γ×I
+
+The basic reproductive ratio R0 for this system is
+
+R0=βγN
+
+
+CODE IS AS FOLLOWS 
+
+
+###########################################
+#    SIMPLE SIR MODEL BY DR.ABDUL ALI     #
+###########################################
+
+#Description of Model - SIR
+
+#S susceptibles, I infectious and R recovered. Susceptibles become infected at a rate equal to the product of an infectious contact rate β and the number of infectious I. Infectious people recover at a rate γ.
+
+#PACKAGES REQUIRED ARE - ggplot, rehshape2 and deSolve, if these packages are not installed, please install them with simple command as install.package("packagename")
+
+
+#Here are steps to functionate SIR Model
+
+#STEP 1 : writing the differential equations in R
+#Note the use of the with() function in the function below:
+#important note: with() works on lists only, not on vectors.
+
+sir_equations <- function(time, variables, parameters) {
+  with(as.list(c(variables, parameters)), {
+    dS <- -beta * I * S
+    dI <-  beta * I * S - gamma * I
+    dR <-  gamma * I
+    return(list(c(dS, dI, dR)))
+  })
+}
+
+
+#sTEP 2:  defining some values for the parameters
+#Parameters values need to be defined in a named vector:
+
+
+
+parameters_values <- c(
+  beta  = 0.002, # infectious contact rate (/person/day)
+  gamma = 0.3    # recovery rate (/day)
+)
+
+
+#STEP 3: defining initial values for the variables
+
+#The initial values of the variables need to be defined in a named vector:
+
+initial_values <- c(
+  S = 999,  # number of susceptibles at time = 0
+  I =   1,  # number of infectious at time = 0
+  R =   0   # number of recovered (and immune) at time = 0
+)
+
+
+#STEP 4: the points in time where to calculate variables values
+
+#We want to know the values of our SIR model variables at these time points:
+
+
+time_values <- seq(0, 10) # days
+
+#step 5: Numerically solving the SIR model
+
+#We have defined all the needed components
+
+ls()
+
+
+
+sir_equations
+
+## function(time, variables, parameters) {
+##   with(as.list(c(variables, parameters)), {
+##     dS <- -beta * I * S
+##     dI <-  beta * I * S - gamma * I
+##     dR <-  gamma * I
+##     return(list(c(dS, dI, dR)))
+##   })
+## }
+
+
+parameters_values
+
+##  beta gamma
+## 0.002 0.300
+
+initial_values
+
+##   S   I   R
+## 999   1   0 YOU CAN PLAY WITH THEM :) BY CHANGING THEM
+
+
+
+time_values
+
+##  [1]  0  1  2  3  4  5  6  7  8  9 10 - Number of days
+
+sir_values_1 <- ode(
+  y = initial_values,
+  times = time_values,
+  func = sir_equations,
+  parms = parameters_values
+)
+
+
+sir_values_1
+
+
+sir_values_1 <- as.data.frame(sir_values_1)
+sir_values_1
+
+
+
+with(sir_values_1, {
+  # plotting the time series of susceptibles:
+  plot(time, S, type = "l", col = "blue",
+       xlab = "time (days)", ylab = "number of people")
+  # adding the time series of infectious:
+  lines(time, I, col = "red")
+  # adding the time series of recovered:
+  lines(time, R, col = "green")
+})
+
+# adding a legend:
+legend("right", c("susceptibles", "infectious", "recovered"),
+       col = c("blue", "red", "green"), lty = 1, bty = "n")
+
+
+#ENJOY - SHARE WITH OTHERS AND KEEP LEARNING :) YOU ARE ALMOST THERE :) DR. ABDUL ALI
